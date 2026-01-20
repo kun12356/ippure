@@ -1,0 +1,16 @@
+#!name=贴吧去广告精简专版
+#!desc=基于向晚馆脚本制作，包含JSON与Proto双重解密，极致去广告。
+#!author=向晚馆 & Gemini整理
+#!date=2026-01-20
+
+[Script]
+# 贴吧 JSON 去广告 (首页、帖子列表、推荐等)
+tieba-json = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/(c\/(s\/sync|f\/(ad\/getSplashAd|frs\/(page|threadlist|generalTabList)|pb\/(pic)?page|excellent\/personalized))$|tiebaads\/commonbatch\?), script-path=https://xiangwanguan.github.io/Shadowrocket/Rewrite/JS/tieba-json.js, requires-body=true, max-size=0
+
+# 贴吧 Proto 去广告 (底层二进制解密，针对新版 Feed 流广告)
+tieba-proto = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/c\/(b\/ad\/adBid|f\/(frs\/(page|threadlist|generalTabList)|ad\/getFeedAd|pb\/page|excellent\/personalized))(\?cmd)?$, script-path=https://xiangwanguan.github.io/Shadowrocket/Rewrite/JS/tieba-proto.js, requires-body=true, max-size=0, binary-body-mode=true
+
+[MITM]
+# 必须声明主机名才能使脚本生效
+hostname = %APPEND% tiebac.baidu.com, c.tieba.baidu.com
+
