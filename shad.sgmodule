@@ -1,16 +1,17 @@
-#!name=贴吧去广告精简专版
-#!desc=基于向晚馆脚本制作，包含JSON与Proto双重解密，极致去广告。
-#!author=向晚馆 & Gemini整理
+#!name=贴吧去广告+精简底栏版
+#!desc=集成向晚馆去广告与墨鱼底栏精简。移除广告、移除小卖部、移除游戏中心。
+#!author=向晚馆, ddgksf2013 & Gemini整理
 #!date=2026-01-20
 
 [Script]
-# 贴吧 JSON 去广告 (首页、帖子列表、推荐等)
-tieba-json = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/(c\/(s\/sync|f\/(ad\/getSplashAd|frs\/(page|threadlist|generalTabList)|pb\/(pic)?page|excellent\/personalized))$|tiebaads\/commonbatch\?), script-path=https://xiangwanguan.github.io/Shadowrocket/Rewrite/JS/tieba-json.js, requires-body=true, max-size=0
+# 1. 贴吧 JSON 去广告 (首页、帖子列表等)
+tieba-json = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/(c\/(s\/sync|f\/(ad\/getSplashAd|frs\/(page|threadlist|generalTabList)|pb\/(pic)?page|excellent\/personalized))$|tiebaads\/commonbatch\?), script-path=https://raw.githubusercontent.com/XiangwanGuan/Shadowrocket/main/Rewrite/JS/tieba-json.js, requires-body=true, max-size=0
 
-# 贴吧 Proto 去广告 (底层二进制解密，针对新版 Feed 流广告)
-tieba-proto = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/c\/(b\/ad\/adBid|f\/(frs\/(page|threadlist|generalTabList)|ad\/getFeedAd|pb\/page|excellent\/personalized))(\?cmd)?$, script-path=https://xiangwanguan.github.io/Shadowrocket/Rewrite/JS/tieba-proto.js, requires-body=true, max-size=0, binary-body-mode=true
+# 2. 贴吧 Proto 二进制去广告 (Feed流广告)
+tieba-proto = type=http-response, pattern=^https?:\/\/(tiebac|c\.tieba)\.baidu\.com\/c\/(b\/ad\/adBid|f\/(frs\/(page|threadlist|generalTabList)|ad\/getFeedAd|pb\/page|excellent\/personalized))(\?cmd)?$, script-path=https://raw.githubusercontent.com/XiangwanGuan/Shadowrocket/main/Rewrite/JS/tieba-proto.js, requires-body=true, max-size=0, binary-body-mode=true
+
+# 3. 专用底栏精简补丁 (移除小卖部、游戏中心等)
+tieba-footer = type=http-response, pattern=^https?:\/\/tiebac\.baidu\.com\/c\/f\/frs\/page, script-path=https://raw.githubusercontent.com/ddgksf2013/scripts/master/tieba_footer.js, requires-body=true, max-size=0
 
 [MITM]
-# 必须声明主机名才能使脚本生效
 hostname = %APPEND% tiebac.baidu.com, c.tieba.baidu.com
-
