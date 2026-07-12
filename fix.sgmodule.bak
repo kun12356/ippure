@@ -1,0 +1,56 @@
+[URL Rewrite]
+# ===== BEGIN: 酷安去广告 =====
+# source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
+# type: manual
+# last-sync: 2026-07-12
+# > 酷安_屏蔽热词@ddgksf2013
+^https?:\/\/api\.coolapk\.com\/v6\/search\?.*type=hotSearch - reject-200
+# ===== END: 酷安去广告 =====
+
+[Script]
+# ===== BEGIN: 酷安去广告 =====
+# source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
+# type: manual
+# last-sync: 2026-07-12
+# > 酷安_开屏广告@ddgksf2013
+coolapk = type=http-response, pattern=^https?:\/\/api.coolapk.com\/v6\/main\/init, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+
+# > 酷安_推广广告@ddgksf2013
+coolapk = type=http-response, pattern=^https?:\/\/api.coolapk.com\/v6\/dataList, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+
+# > 酷安_首页广告@ddgksf2013
+coolapk = type=http-response, pattern=^https?:\/\/api.coolapk.com\/v6\/main\/indexV8, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+
+# > 酷安_评论广告@ddgksf2013
+coolapk = type=http-response, pattern=^https?:\/\/api.coolapk.com\/v6\/feed\/replyList, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+
+# > 酷安_商品推广@ddgksf2013
+coolapk = type=http-response, pattern=^https?:\/\/api.coolapk.com\/v6\/feed\/detail, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+
+# > 酷安_酷品页推广@ddgksf2013
+coolapk = type=http-response, pattern=https://api.coolapk.com/v6/page/dataList\?.*title=%E9%85, script-path=https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js, requires-body=true, max-size=-1, timeout=60
+# ===== END: 酷安去广告 =====
+
+# ===== BEGIN: YouTubeNoAd =====
+# source: https://raw.githubusercontent.com/iab0x00/ProxyRules/main/Rewrite/YouTubeNoAd.sgmodule
+# type: raw
+# last-sync: 2026-07-12
+youtube.response = type=http-response, pattern=^https:\/\/youtubei\.googleapis\.com\/(youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch|log_event|config))(\?(.*))?$, script-path=https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js, requires-body=true, binary-body-mode=true, max-size=0, argument="{"captionLang":"{{{字幕翻译语言}}}","blockUpload":{{{屏蔽上传按钮}}},"blockImmersive":{{{屏蔽选段按钮}}},"blockShorts":{{{屏蔽Shorts按钮}}},"debug":{{{启用调试模式}}}}"
+youtube.request.init = type=http-request, pattern=^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&ack.*, script-path=https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js, requires-body=true, binary-body-mode=true, max-size=0, argument="{"captionLang":"{{{字幕翻译语言}}}"}"
+youtube.request.log_event = type=http-request, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/log_event, script-path=https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js, requires-body=true, binary-body-mode=true, max-size=0
+# ===== END: YouTubeNoAd =====
+
+[MITM]
+# ===== BEGIN: 酷安去广告 =====
+# source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
+# type: manual
+# last-sync: 2026-07-12
+hostname = %APPEND% api.coolapk.com
+# ===== END: 酷安去广告 =====
+
+# ===== BEGIN: YouTubeNoAd =====
+# source: https://raw.githubusercontent.com/iab0x00/ProxyRules/main/Rewrite/YouTubeNoAd.sgmodule
+# type: raw
+# last-sync: 2026-07-12
+hostname = %APPEND% *.googlevideo.com, youtubei.googleapis.com
+# ===== END: YouTubeNoAd =====
