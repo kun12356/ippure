@@ -1,3 +1,7 @@
+#!url=https://raw.githubusercontent.com/kun12356/ippure/refs/heads/main/fix.sgmodule
+#!name=整合模块
+#!desc=2026-01-20 14:38:00
+
 [URL Rewrite]
 # ===== BEGIN: 酷安去广告 =====
 # source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
