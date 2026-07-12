@@ -1,6 +1,7 @@
 #!url=https://raw.githubusercontent.com/kun12356/ippure/refs/heads/main/fix.sgmodule
 #!name=整合模块
 #!desc=2026-01-20 14:38:00
+#!arguments-desc=\n▶ 参数说明:\n\n - 屏蔽按钮: 默认开启，可手动切换\n\n - 调试模式: 默认关闭，非调试无需切换\n\n - 翻译语言: 默认关闭，可自定义语言代码\n\n\n▶ 语言代码：\n\n - 翻译语言可根据需求自定义，语言代码遵循Google Translate Languages Codes，示例如下↓\n\n - 简中: zh-Hans，日语: ja，韩语: ko，西语: es，法语: fr
 
 [URL Rewrite]
 # ===== BEGIN: 酷安去广告 =====
