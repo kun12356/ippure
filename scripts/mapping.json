@@ -2,5 +2,21 @@
   "scripts/kuan/coolapk.js": {
     "upstream_url": "https://github.com/ddgksf2013/Scripts/raw/master/coolapk.js",
     "module": "kuan"
+  },
+  "scripts/youtube/youtube.response.js": {
+    "upstream_url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.response.js",
+    "module": "youtube"
+  },
+  "scripts/youtube/youtube.request.js": {
+    "upstream_url": "https://raw.githubusercontent.com/Maasea/sgmodule/master/Script/Youtube/youtube.request.js",
+    "module": "youtube"
+  },
+  "scripts/wloc/wloc.js": {
+    "upstream_url": "https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/dist/wloc.js",
+    "module": "wloc"
+  },
+  "scripts/wloc/wloc-settings.js": {
+    "upstream_url": "https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/dist/wloc-settings.js",
+    "module": "wloc"
   }
 }

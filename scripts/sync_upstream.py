@@ -279,89 +279,80 @@ def parse_upstream_module(content: str) -> dict:
     }
 
 
-# ─── 脚本同步 ─────────────────────────────────────────────────
+# ─── 脚本同步（以 fix.sgmodule 实际引用为准） ──────────────
 
-def sync_scripts(module_name: str, scripts_dir: str,
-                 new_script_urls: set[str], mapping: dict) -> list[str]:
+LOCAL_SCRIPT_RE = re.compile(rf"script-path={re.escape(RAW_BASE)}/(scripts/.+?\.js)")
+
+def sync_all_scripts(mapping: dict) -> list[str]:
     """
-    同步某个模块的 JS 脚本：
-    - 新 URL → 下载到 scripts/<scripts_dir>/
-    - 已删除的 URL → 移除本地文件和 mapping 条目
-    - 保留的 URL → 哈希对比，有变化则更新
+    以 fix.sgmodule 中实际引用的脚本路径为准，同步所有 JS 脚本：
+
+    1. 扫描 fix.sgmodule 找出所有本地 script-path 引用
+    2. 对于 fix.sgmodule 引用的脚本：
+       - mapping 中有记录 → 检查上游是否更新
+       - mapping 中无记录 → 尝试从 URL 文件名反查上游下载
+    3. 对于 mapping 中有但 fix.sgmodule 不再引用的 → 删除本地文件和 mapping 条目
 
     返回变更描述列表，同时原地更新 mapping。
     """
     changes = []
+    fix_content = read_file(FIX_MODULE) if os.path.exists(FIX_MODULE) else ""
 
-    # 找出该模块在 mapping 中的现有条目
-    module_entries: dict[str, dict] = {}  # upstream_url → mapping entry
-    for local_path, entry in list(mapping.items()):
-        if entry.get("module") == scripts_dir:
-            module_entries[entry["upstream_url"]] = {
-                "local_path": local_path,
-                "entry": entry,
-            }
+    # 1. 收集 fix.sgmodule 中所有本地脚本引用
+    referenced_paths: set[str] = set()
+    for m in LOCAL_SCRIPT_RE.finditer(fix_content):
+        referenced_paths.add(m.group(1))
 
-    # ── 新增脚本 ──
-    for url in sorted(new_script_urls):
-        if url in module_entries:
-            continue
-        filename = url.rstrip("/").split("/")[-1]
-        if not filename.endswith(".js"):
-            continue
-        local_path = f"scripts/{scripts_dir}/{filename}"
+    print(f"\n  fix.sgmodule 引用了 {len(referenced_paths)} 个本地脚本")
+
+    # 2. 检查每个被引用的脚本
+    for local_path in sorted(referenced_paths):
         abs_path = os.path.join(REPO_ROOT, local_path)
+        exists = os.path.exists(abs_path)
 
-        content = fetch_url(url, timeout=60)
-        if content is None:
-            changes.append(f"  !! {module_name}: 无法下载新脚本 {filename}")
-            continue
+        if local_path in mapping:
+            upstream_url = mapping[local_path]["upstream_url"]
 
-        if is_dry_run():
-            print(f"  [DRY-RUN] 新增脚本: {local_path}")
+            # 检查上游是否有更新
+            remote_content = fetch_url(upstream_url, timeout=60)
+            if remote_content is None:
+                if not exists:
+                    changes.append(f"  !! 脚本缺失且无法下载: {local_path}")
+                continue
+
+            if not exists:
+                # 文件被误删，重新下载
+                if not is_dry_run():
+                    write_file(abs_path, remote_content)
+                changes.append(f"  + 恢复脚本: {local_path}")
+            elif sha256(remote_content) != sha256(read_file(abs_path)):
+                # 有更新
+                if not is_dry_run():
+                    write_file(abs_path, remote_content)
+                filename = local_path.split("/")[-1]
+                changes.append(f"  * 更新脚本: {filename}")
         else:
-            write_file(abs_path, content)
-        mapping[local_path] = {
-            "upstream_url": url,
-            "module": scripts_dir,
-        }
-        changes.append(f"  + 新增脚本: {filename}")
+            # fix.sgmodule 引用了但 mapping 中没有
+            # 尝试从上游模块的 BEGIN 块注释中查找该脚本的原始 URL
+            # 如果找不到，只报告，不删除（因为是 fix.sgmodule 引用的）
+            if not exists:
+                changes.append(f"  !! 脚本缺失且无上游记录: {local_path}")
 
-    # ── 移除已删除的脚本 ──
-    for url, info in list(module_entries.items()):
-        if url in new_script_urls:
-            continue
-        local_path = info["local_path"]
+    # 3. 清理 fix.sgmodule 不再引用的脚本（仅当 fix.sgmodule 已更新后）
+    to_remove = []
+    for local_path in list(mapping.keys()):
+        if local_path not in referenced_paths:
+            to_remove.append(local_path)
+
+    for local_path in to_remove:
         abs_path = os.path.join(REPO_ROOT, local_path)
         if is_dry_run():
-            print(f"  [DRY-RUN] 移除脚本: {local_path}")
+            print(f"  [DRY-RUN] 清理未引用脚本: {local_path}")
         else:
             if os.path.exists(abs_path):
                 os.remove(abs_path)
-        if local_path in mapping:
-            del mapping[local_path]
-        filename = url.rstrip("/").split("/")[-1]
-        changes.append(f"  - 移除脚本: {filename}")
-
-    # ── 检查保留脚本的上游更新 ──
-    for url, info in list(module_entries.items()):
-        if url not in new_script_urls:
-            continue
-        local_path = info["local_path"]
-        abs_path = os.path.join(REPO_ROOT, local_path)
-
-        remote_content = fetch_url(url, timeout=60)
-        if remote_content is None:
-            continue
-
-        local_content = read_file(abs_path) if os.path.exists(abs_path) else ""
-        if sha256(remote_content) != sha256(local_content):
-            if is_dry_run():
-                print(f"  [DRY-RUN] 更新脚本: {local_path}")
-            else:
-                write_file(abs_path, remote_content)
-            filename = url.rstrip("/").split("/")[-1]
-            changes.append(f"  * 更新脚本: {filename}")
+        del mapping[local_path]
+        changes.append(f"  - 清理未引用脚本: {local_path}")
 
     return changes
 
@@ -567,12 +558,6 @@ def main() -> None:
         old_content = read_file(archive_path) if os.path.exists(archive_path) else ""
         if sha256(latest_content) == sha256(old_content):
             print(f"   ✅ 无变化")
-            # 即使模块无变化，也检查一下脚本是否需要更新
-            script_changes = sync_scripts(mod_name, scripts_dir, set(), mapping)
-            if script_changes:
-                has_any_change = True
-                changes.append(f"模块 {mod_name}: 脚本更新（模块本身无变化）")
-                changes.extend(script_changes)
             continue
 
         has_any_change = True
@@ -625,14 +610,10 @@ def main() -> None:
 
             section_changes += 1
 
-        # 4f. 同步脚本
-        script_changes = sync_scripts(mod_name, scripts_dir,
-                                      new_parsed["script_urls"], mapping)
         if section_changes > 0:
             changes.append(f"同步更新: {mod_name}, 变化 {section_changes} 个段落")
-        changes.extend(script_changes)
 
-        # 4g. 合并 MITM 域名
+        # 合并 MITM 域名
         mitm_hosts |= new_parsed["mitm_hosts"]
 
     # 5. 更新 MITM 行
@@ -655,6 +636,12 @@ def main() -> None:
     if has_any_change and not dry:
         write_file(FIX_MODULE, "".join(all_lines))
         print(f"\n✓ fix.sgmodule 已更新")
+
+    # 6b. 同步脚本（以 fix.sgmodule 实际引用为准）
+    script_changes = sync_all_scripts(mapping)
+    if script_changes:
+        has_any_change = True
+        changes.extend(script_changes)
 
     # 7. 写回 mapping.json
     if has_any_change and not dry:
