@@ -58,4 +58,4 @@ WLOC Settings = type=http-request,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/
 # ===== END: wloc =====
 
 [MITM]
-hostname = %APPEND% api.coolapk.com,*.googlevideo.com, youtubei.googleapis.com, gs-loc.apple.com, gs-loc-cn.apple.com
+hostname = %APPEND% *.googlevideo.com, api.coolapk.com, gs-loc-cn.apple.com, gs-loc.apple.com, youtubei.googleapis.com
