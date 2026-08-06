@@ -6,6 +6,7 @@
 
       ```
       sources/         每个新增模块的原样存档
+      scripts/         所有模块引用的 JS 脚本本地副本（自托管，不依赖外部仓库）
       fix.sgmodule     所有新增模块的合并产物，即最终被小火箭订阅的文件
       ```
 
@@ -57,6 +58,87 @@
       新增/更新模块时，如果该模块涉及 HTTPS 解密（大部分去广告/重写类模块都需要），必须同步检查并更新这一行的域名列表；移除模块时同理，需要把该模块专属、其他模块不需要的域名从列表中摘除。
 
       ------
+
+# JS 脚本本地化管理
+
+`fix.sgmodule` 中所有 `script-path=` 引用的 JS 脚本都托管在本仓库的 `scripts/` 目录下，通过 `raw.githubusercontent.com/kun12356/ippure` 提供访问，不依赖外部作者的 repo。防止上游删库或设为私有时模块静默失效。
+
+## 目录结构
+
+```
+scripts/
+  模块名/
+    xxx.js
+    yyy.js
+scripts/mapping.json    # 记录每个本地脚本对应的上游来源 URL
+```
+
+子目录名与 `sources/` 中的模块存档 basename 对应（使用简短易读的名称，不强制同名）。
+
+## mapping.json 格式
+
+每条记录以本地相对路径为 key：
+```json
+{
+  "scripts/<模块>/<文件名>.js": {
+    "upstream_url": "<原始远程URL>",
+    "module": "<模块子目录名>"
+  }
+}
+```
+
+## 各场景中的脚本处理规则
+
+### 场景一（新增模块）
+
+在步骤3（拆分内容插入 fix.sgmodule）之后增加：
+
+4. 从该模块内容中提取所有 `script-path=` 引用的外部 JS URL
+5. 在 `scripts/` 下创建以模块名命名的子目录
+6. 下载每个 JS 文件，保存到该子目录
+7. 在插入 fix.sgmodule 的内容中，将所有 `script-path=` URL 替换为本地 raw URL：
+   `https://raw.githubusercontent.com/kun12356/ippure/refs/heads/main/scripts/<模块>/<文件名>.js`
+8. 更新 `scripts/mapping.json`，登记每个脚本的映射关系
+
+### 场景二（已有模块更新，raw 类型）
+
+在步骤3（有差异，替换变化部分）处理完 sgmodule 规则内容后：
+
+4. 对比模块新旧版本中的 `script-path=` 引用：
+   - **旧版有、新版无**：从 `scripts/<模块>/` 和 `mapping.json` 中移除
+   - **旧版无、新版有**：下载保存，更新 `mapping.json`
+   - **URL 变化但实际是同一脚本**：更新 mapping.json 中的 `upstream_url`，不重新下载
+5. 对于所有保留的脚本 URL，用哈希对比检查上游脚本内容是否已更新：
+   ```bash
+   curl -sL <上游URL> | md5sum
+   md5sum scripts/<模块>/<文件名>.js
+   ```
+   如有差异，下载最新内容覆盖本地
+6. 确保 fix.sgmodule 中该模块的所有 script-path 引用使用的是本地 URL
+
+### 场景四（移除模块）
+
+在步骤1（删除 BEGIN/END 区块）之后增加：
+
+1.5. 删除 `scripts/<模块>/` 整个子目录
+1.6. 从 `scripts/mapping.json` 中移除该模块的所有条目
+
+### 手动批量更新脚本
+
+用户可通过指令单独更新所有已托管脚本（不涉及 sgmodule 规则）：
+
+> 检查 scripts 目录下所有脚本的上游是否有更新，先汇报，不写入。
+
+流程：
+1. 遍历 `scripts/mapping.json` 中的所有条目
+2. 对每条记录，curl 下载上游 URL 内容，与本地文件做哈希对比
+3. 汇总列出有变化的脚本列表
+4. 确认后逐个下载覆盖，commit message：
+   ```
+   更新托管脚本: <脚本1>, <脚本2>（共N个）
+   ```
+
+------
 
       # 两种来源类型
 
