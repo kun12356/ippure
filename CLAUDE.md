@@ -297,6 +297,31 @@ scripts/mapping.json    # 记录每个本地脚本对应的上游来源 URL
       > 我把 sources/酷安去广告.sgmodule 内容更新了，帮我对比一下改了什么，同步进fix.sgmodule。
   
       ------
+
+# GitHub Actions 自动同步
+
+项目配置了 `.github/workflows/sync-upstream.yml`，每天北京时间 00:37 自动运行 `scripts/sync_upstream.py`，对 `fix.sgmodule` 中所有 `type: raw` 的模块自动检查并同步更新。
+
+- 哈希对比各模块上游内容与 `sources/` 存档
+- 有变化则自动下载、更新 `fix.sgmodule` 对应区块、同步关联 JS 脚本
+- 自动 commit + push，GitHub 默认发送邮件通知
+
+也支持手动触发：GitHub Actions UI → Sync Upstream Modules → Run workflow。
+
+## scripts-dir 元数据
+
+每个 raw 模块的 BEGIN 区块需标注 `# scripts-dir:`，指明 `scripts/` 下存放该模块脚本的子目录名。若未标注，默认取模块名小写。
+
+```
+# ===== BEGIN: YouTubeNoAd =====
+# source: https://raw.githubusercontent.com/.../YouTubeNoAd.sgmodule
+# type: raw
+# scripts-dir: youtube
+# last-sync: 2026-07-12
+```
+
+------
+
   
       # 禁止事项
       
