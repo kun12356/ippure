@@ -3,6 +3,7 @@
 #!desc=2026-01-20 14:38:00
 #!arguments=屏蔽上传按钮:true, 屏蔽选段按钮:true, 屏蔽Shorts按钮:false, 启用调试模式:false, 字幕翻译语言:off
 #!arguments-desc=\n▶ 参数说明:\n\n - 屏蔽按钮: 默认开启，可手动切换\n\n - 调试模式: 默认关闭，非调试无需切换\n\n - 翻译语言: 默认关闭，可自定义语言代码\n\n\n▶ 语言代码：\n\n - 翻译语言可根据需求自定义，语言代码遵循Google Translate Languages Codes，示例如下↓\n\n - 简中: zh-Hans，日语: ja，韩语: ko，西语: es，法语: fr
+#
 
 [URL Rewrite]
 # ===== BEGIN: 酷安去广告 =====
@@ -49,7 +50,7 @@ youtube.request.log_event = type=http-request, pattern=^https:\/\/youtubei\.goog
 # ===== BEGIN: wloc =====
 # source: https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/modules/wloc.module
 # type: raw
-# last-sync: 2026-07-15
+# last-sync: 2026-08-06
 Apple WLOC = type=http-response,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/clls\/wloc,requires-body=1,binary-body-mode=1,max-size=0,timeout=30,script-path=https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/dist/wloc.js,argument=longitude=113.94114&latitude=22.544577&accuracy=25&logLevel=info
 WLOC Settings = type=http-request,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/wloc-settings\/save,requires-body=0,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/Yu9191/wloc/refs/heads/main/dist/wloc-settings.js
 # ===== END: wloc =====
