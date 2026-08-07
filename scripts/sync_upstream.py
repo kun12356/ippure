@@ -28,7 +28,7 @@ MAPPING_FILE = os.path.join(SCRIPTS_DIR, "mapping.json")
 FIX_MODULE = os.path.join(REPO_ROOT, "fix.sgmodule")
 
 GITHUB_REPO = os.environ.get("GITHUB_REPOSITORY", "kun12356/ippure")
-GITHUB_BRANCH = os.environ.get("GITHUB_BRANCH", "main")
+GITHUB_BRANCH = os.environ.get("GITHUB_REF_NAME", "main")
 RAW_BASE = f"https://raw.githubusercontent.com/{GITHUB_REPO}/refs/heads/{GITHUB_BRANCH}"
 
 # ─── 正则 ────────────────────────────────────────────────────
@@ -676,4 +676,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"\nFATAL: {e}", file=sys.stderr)
+        sys.exit(1)
