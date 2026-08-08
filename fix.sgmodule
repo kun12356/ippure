@@ -5,6 +5,19 @@
 #!arguments-desc=\n▶ 参数说明:\n\n - 屏蔽按钮: 默认开启，可手动切换\n\n - 调试模式: 默认关闭，非调试无需切换\n\n - 翻译语言: 默认关闭，可自定义语言代码\n\n\n▶ 语言代码：\n\n - 翻译语言可根据需求自定义，语言代码遵循Google Translate Languages Codes，示例如下↓\n\n - 简中: zh-Hans，日语: ja，韩语: ko，西语: es，法语: fr
 #
 
+[Rule]
+# ===== BEGIN: 微信去广告(网络收集) =====
+# source: 网络收集模块,无上游 raw 地址(已存档 sources/wx.sgmodule,原 GBK 编码)
+# type: manual
+# last-sync: 2026-08-08
+# > 域名级拦截:微信 DNS/业务域名
+DOMAIN,aedns.weixin.qq.com,REJECT,pre-matching
+DOMAIN,badjs.weixinbridge.com,REJECT,pre-matching
+DOMAIN,dns.weixin.qq.com,REJECT,pre-matching
+DOMAIN,dns.weixin.qq.com.cn,REJECT,pre-matching
+DOMAIN-SUFFIX,wxs.qq.com,REJECT,pre-matching
+# ===== END: 微信去广告(网络收集) =====
+
 [URL Rewrite]
 # ===== BEGIN: 酷安去广告 =====
 # source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
@@ -14,17 +27,27 @@
 ^https?:\/\/api\.coolapk\.com\/v6\/search\?.*type=hotSearch - reject-200
 # ===== END: 酷安去广告 =====
 
-# ===== BEGIN: 微信小程序去广告 =====
+# ===== BEGIN: 微信小程序去广告 [已注释停用 2026-08-08,由"微信去广告(网络收集)"替代;恢复时取消下方规则行 # 前缀,MITM 域名已保留] =====
 # source: 自研模块,基于 2026-08-08 抓包分析(appid wx3685801519731c2e,租房合同小程序),无上游 raw 地址
 # type: manual
 # last-sync: 2026-08-08
 # > 拦截自建广告配置接口:首页顶部广告位配置(aster.yuxiaor.com)
-^https?:\/\/aster\.yuxiaor\.com\/config\/aster-(home-public-)?ad-config-v2\.json.* - reject-200
+# ^https?:\/\/aster\.yuxiaor\.com\/config\/aster-(home-public-)?ad-config-v2\.json.* - reject-200
 # > 拦截自建广告图片下载(appimg 路径,5秒加载页/首页广告图)
-^https?:\/\/aster\.yuxiaor\.com\/appimg\/.* - reject-200
+# ^https?:\/\/aster\.yuxiaor\.com\/appimg\/.* - reject-200
 # > 拦截微信流量主视频广告(ads_svp_video 特征,通用)
-^https?:\/\/wxsmw\.wxs\.qq\.com\/.*snssvpdownload\/.*ads_svp_video - reject-200
+# ^https?:\/\/wxsmw\.wxs\.qq\.com\/.*snssvpdownload\/.*ads_svp_video - reject-200
 # ===== END: 微信小程序去广告 =====
+
+# ===== BEGIN: 微信去广告(网络收集) =====
+# source: 网络收集模块,无上游 raw 地址(已存档 sources/wx.sgmodule,原 GBK 编码)
+# type: manual
+# last-sync: 2026-08-08
+# > 公众号文章页广告接口拦截(mp.weixin.qq.com/mp/...)
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/(?:ad_|advertisement|getappmsgad|cps_product_info|masonryfeed|relatedarticle|relatedsearchword|searchkeywordreport|geticon|getainfo|jsmonitor) - reject-dict
+# > 微信支付频道广告(payapp.weixin.qq.com 黄金计划广告页)
+^https?:\/\/payapp\.weixin\.qq\.com\/mchopenapp\/goldplan\/adpage - reject
+# ===== END: 微信去广告(网络收集) =====
 
 [Script]
 # ===== BEGIN: 酷安去广告 =====
@@ -70,4 +93,4 @@ WLOC Settings = type=http-request,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/
 # ===== END: wloc =====
 
 [MITM]
-hostname = %APPEND% *.googlevideo.com, api.coolapk.com, aster.yuxiaor.com, gs-loc-cn.apple.com, gs-loc.apple.com, wxsmw.wxs.qq.com, youtubei.googleapis.com
+hostname = %APPEND% *.googlevideo.com, api.coolapk.com, aster.yuxiaor.com, gs-loc-cn.apple.com, gs-loc.apple.com, mp.weixin.qq.com, payapp.weixin.qq.com, wxsmw.wxs.qq.com, youtubei.googleapis.com

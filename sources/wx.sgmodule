@@ -1,0 +1,16 @@
+#!name=微信
+#!desc=2026-07-04 09:52:25
+
+[Rule]
+DOMAIN,aedns.weixin.qq.com,REJECT,pre-matching
+DOMAIN,badjs.weixinbridge.com,REJECT,pre-matching
+DOMAIN,dns.weixin.qq.com,REJECT,pre-matching
+DOMAIN,dns.weixin.qq.com.cn,REJECT,pre-matching
+DOMAIN-SUFFIX,wxs.qq.com,REJECT,pre-matching
+
+[URL Rewrite]
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/(?:ad_|advertisement|getappmsgad|cps_product_info|masonryfeed|relatedarticle|relatedsearchword|searchkeywordreport|geticon|getainfo|jsmonitor) - reject-dict
+^https?:\/\/payapp\.weixin\.qq\.com\/mchopenapp\/goldplan\/adpage - reject
+
+[MITM]
+hostname = %APPEND% mp.weixin.qq.com,payapp.weixin.qq.com
