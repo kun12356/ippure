@@ -6,6 +6,8 @@
 [URL Rewrite]
 # > 拦截自建广告配置接口:首页顶部广告位配置(aster.yuxiaor.com)
 ^https?:\/\/aster\.yuxiaor\.com\/config\/aster-(home-public-)?ad-config-v2\.json.* - reject-200
+# > 拦截自建广告图片下载(appimg 路径,5秒加载页/首页广告图)
+^https?:\/\/aster\.yuxiaor\.com\/appimg\/.* - reject-200
 # > 拦截微信流量主视频广告(ads_svp_video 特征,通用)
 ^https?:\/\/wxsmw\.wxs\.qq\.com\/.*snssvpdownload\/.*ads_svp_video - reject-200
 
