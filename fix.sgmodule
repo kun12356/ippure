@@ -14,6 +14,16 @@
 ^https?:\/\/api\.coolapk\.com\/v6\/search\?.*type=hotSearch - reject-200
 # ===== END: 酷安去广告 =====
 
+# ===== BEGIN: 微信小程序去广告 =====
+# source: 自研模块,基于 2026-08-08 抓包分析(appid wx3685801519731c2e,租房合同小程序),无上游 raw 地址
+# type: manual
+# last-sync: 2026-08-08
+# > 拦截自建广告配置接口:首页顶部广告位配置(aster.yuxiaor.com)
+^https?:\/\/aster\.yuxiaor\.com\/config\/aster-(home-public-)?ad-config-v2\.json.* - reject-200
+# > 拦截微信流量主视频广告(ads_svp_video 特征,通用)
+^https?:\/\/wxsmw\.wxs\.qq\.com\/.*snssvpdownload\/.*ads_svp_video - reject-200
+# ===== END: 微信小程序去广告 =====
+
 [Script]
 # ===== BEGIN: 酷安去广告 =====
 # source: http://script.hub/file/_start_/https://raw.githubusercontent.com/ddgksf2013/Scripts/master/coolapk.js/_end_/coolapk.sgmodule?type=qx-rewrite&n=%E9%85%B7%E5%AE%89%E5%8E%BB%E5%B9%BF%E5%91%8A%40ddgksf2013+%E5%BA%94%E7%94%A8%E5%87%80%E5%8C%96&headers=User-Agent:surge&del=true&jqEnabled=true&target=shadowrocket-module&category=ddgksf2013
@@ -58,4 +68,4 @@ WLOC Settings = type=http-request,pattern=^https?:\/\/gs-loc(-cn)?\.apple\.com\/
 # ===== END: wloc =====
 
 [MITM]
-hostname = %APPEND% *.googlevideo.com, api.coolapk.com, gs-loc-cn.apple.com, gs-loc.apple.com, youtubei.googleapis.com
+hostname = %APPEND% *.googlevideo.com, api.coolapk.com, aster.yuxiaor.com, gs-loc-cn.apple.com, gs-loc.apple.com, wxsmw.wxs.qq.com, youtubei.googleapis.com

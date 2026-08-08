@@ -1,0 +1,13 @@
+#!name=微信小程序去广告
+#!desc=租房合同小程序去广告(自研,标准档:自建广告接口 + 流量主视频)
+# source: 自研模块,基于 2026-08-08 抓包分析(appid wx3685801519731c2e,租房合同小程序),无上游 raw 地址
+# type: manual
+
+[URL Rewrite]
+# > 拦截自建广告配置接口:首页顶部广告位配置(aster.yuxiaor.com)
+^https?:\/\/aster\.yuxiaor\.com\/config\/aster-(home-public-)?ad-config-v2\.json.* - reject-200
+# > 拦截微信流量主视频广告(ads_svp_video 特征,通用)
+^https?:\/\/wxsmw\.wxs\.qq\.com\/.*snssvpdownload\/.*ads_svp_video - reject-200
+
+[MITM]
+hostname = %APPEND% aster.yuxiaor.com, wxsmw.wxs.qq.com
