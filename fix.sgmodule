@@ -27,7 +27,8 @@ DOMAIN-SUFFIX,wxs.qq.com,REJECT,pre-matching
 ^https?:\/\/api\.coolapk\.com\/v6\/search\?.*type=hotSearch - reject-200
 # ===== END: 酷安去广告 =====
 
-# ===== BEGIN: 微信小程序去广告 [已注释停用 2026-08-08,由"微信去广告(网络收集)"替代;恢复时取消下方规则行 # 前缀,MITM 域名已保留] =====
+# ===== BEGIN: 微信小程序去广告 =====
+# > 已注释停用 2026-08-08,由「微信去广告(网络收集)」替代;恢复时取消下方规则行 # 前缀,MITM 域名已保留
 # source: 自研模块,基于 2026-08-08 抓包分析(appid wx3685801519731c2e,租房合同小程序),无上游 raw 地址
 # type: manual
 # last-sync: 2026-08-08
