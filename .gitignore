@@ -2,3 +2,16 @@
 stream/*.har
 stream/*.PNG
 stream/*.png
+
+# index.html 及其引用的本地图片目录,不进 git
+index.html
+images/
+
+# Python 缓存
+scripts/__pycache__/
+
+# 本地看图工具(vision skill 依赖,非模块脚本)
+scripts/vision/
+
+# 闲鱼订单录入中间产物(导入后即清空)
+闲鱼订单导入.json
